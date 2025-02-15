@@ -19,9 +19,9 @@ module.exports = {
         const reason = interaction.options.getString('reason');
 
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
-        -# Službu manuálně dokončil <@${interaction.user.id}> pomocí příkazu.
-        -# Důvod: \`${reason}\``);
+-# Službu manuálně dokončil <@${interaction.user.id}> pomocí příkazu.
+-# Důvod: \`${reason}\``);
         await interaction.reply({ content: `Služba byla dokončena.
-        Nový pořadník: ${getStringList(dutyList)}`, flags: MessageFlags.Ephemeral });
+Nový pořadník: ${getStringList(dutyList)}`, flags: MessageFlags.Ephemeral });
     },
 };
