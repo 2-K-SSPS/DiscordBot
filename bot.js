@@ -49,15 +49,13 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
-let dutyList = getDutyList();
-
 // listen for the client to be ready
 client.once(Events.ClientReady, (c) => {
     let dutyChannel = c.channels.cache.get('972537907732684880');
     console.log(`Ready! Logged in as ${c.user.tag}`);
 
     schedule('*/2 * * * *', () => {
-        completeDuty(dutyList);
+        let dutyList = completeDuty(getDutyList());
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!`);
     })
 });

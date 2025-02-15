@@ -37,9 +37,12 @@ function rerollDuty(list) {
 
 function getStringList(list) {
     let stringList = ""
-    list.forEach(id => {
-        stringList += `<@${id}> `;
+    list.every((id, i) => {
+        if (i > 5) return false;
+        stringList += i === 0 ? `<@${id}> :rewind:` : ` <@${id}>`;
+        return true;
     })
+    stringList += "..."
     return stringList;
 }
 
