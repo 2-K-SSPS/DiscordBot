@@ -54,11 +54,11 @@ client.once(Events.ClientReady, (c) => {
     let dutyChannel = c.channels.cache.get('972537907732684880');
     console.log(`Ready! Logged in as ${c.user.tag}`);
 
-    schedule('*/2 * * * *', () => {
+    schedule('40 7 * * 1', () => {
         let dutyList = completeDuty(getDutyList());
-        dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!`);
+        dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
+-# Pokud není ve škole, použij \`/reroll\``);
     })
 });
 
-// login with the token from .env.local
 client.login(token);
