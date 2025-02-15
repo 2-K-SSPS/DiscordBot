@@ -28,7 +28,7 @@ function repeatDuty(list) {
 
 function rerollDuty(list) {
     let rerollIndex = JSON.parse(readFileSync('data/duty.json', 'utf8'))["rerollIndex"]; // Reroll index je zde kvůli tomu že pokud chybí 2 lidi co jsou v seznamu za sebou tak by se točili mezi sebou
-    let newCurrent = list.splice(rerollIndex, 1)
+    let newCurrent = list.splice(rerollIndex, 1)[0]
     list.splice(0, 0, newCurrent);
     rerollIndex++;
     writeDutyList(list, rerollIndex);
