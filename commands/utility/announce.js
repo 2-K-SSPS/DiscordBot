@@ -8,7 +8,7 @@ module.exports = {
         .setContexts(InteractionContextType.Guild),
 
     async execute(interaction) {
-        let dutyChannel = interaction.client.channels.cache.get('972537907732684880');
+        let dutyChannel = interaction.client.channels.cache.get('1283009850997215277');
         let dutyList = getDutyList();
 
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!`);
