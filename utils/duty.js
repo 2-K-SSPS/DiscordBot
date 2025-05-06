@@ -35,6 +35,16 @@ function rerollDuty(list) {
     return list;
 }
 
+function undoRerollDuty(list) {
+    let rerollIndex = JSON.parse(readFileSync('data/duty.json', 'utf8'))["rerollIndex"];
+    rerollIndex--;
+    if (rerollIndex < 1) rerollIndex = 1;
+    let newCurrent = list.splice(0, 1)[0];
+    list.splice(rerollIndex-1, 0, newCurrent);
+    writeDutyList(list, rerollIndex);
+    return list;
+}
+
 function getStringList(list) {
     let stringList = ""
     list.every((id, i) => {
@@ -51,5 +61,6 @@ module.exports = {
     completeDuty,
     repeatDuty,
     rerollDuty,
+    undoRerollDuty,
     getStringList,
 };

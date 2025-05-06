@@ -1,16 +1,16 @@
 const { SlashCommandBuilder, MessageFlags, InteractionContextType} = require('discord.js');
-const { getDutyList, rerollDuty, getStringList } = require('../../utils/duty.js');
+const { getDutyList, undoRerollDuty, getStringList } = require('../../utils/duty.js');
 
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('reroll')
-        .setDescription('Přeskočí člověka, který má právě službu. Bude mít službu další týden.')
+        .setName('undo-reroll')
+        .setDescription('Vrátí poslední přeskočení člověka')
         .setContexts(InteractionContextType.Guild)
         .addStringOption(option =>
             option
                 .setName('reason')
-                .setDescription('Důvod pro reroll')
+                .setDescription('Důvod pro undo reroll')
                 .setRequired(true)),
 
     async execute(interaction) {
@@ -19,9 +19,9 @@ module.exports = {
         const reason = interaction.options.getString('reason');
 
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
--# Službu přesločil <@${interaction.user.id}> pomocí příkazu. Přeskočený člověk bude mít službu příští týden.
+-# Službu un-přesločil <@${interaction.user.id}> pomocí příkazu. Člověk, který byl přeskočen, bude mít službu tento týden.
 -# Důvod: \`${reason}\``);
-        await interaction.reply({ content: `Služba byla přeskočena.
+        await interaction.reply({ content: `Služba byla un-přeskočena.
 Nový pořadník: ${getStringList(dutyList)}`, flags: MessageFlags.Ephemeral });
     },
 };
