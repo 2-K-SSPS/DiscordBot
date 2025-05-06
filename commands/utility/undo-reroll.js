@@ -14,7 +14,7 @@ module.exports = {
                 .setRequired(true)),
 
     async execute(interaction) {
-        let dutyList = rerollDuty(getDutyList());
+        let dutyList = undoRerollDuty(getDutyList());
 
         await interaction.reply({ content: `Služba byla un-přeskočena.
 Nový pořadník: ${getStringList(dutyList)}`, flags: MessageFlags.Ephemeral });
