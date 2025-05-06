@@ -1,21 +1,22 @@
 const {readFileSync, writeFileSync} = require("fs");
 
 function getDutyList() {
-    let list = JSON.parse(readFileSync('data/duty.json', 'utf8'));
-    return list["order"];
+    let data = JSON.parse(readFileSync('data/duty.json', 'utf8'));
+    return data["order"];
 }
 
-function writeDutyList(list, rerollIndex=null) {
+function writeDutyList(list, rerollIndices=null, currentIndex = 0) {
     let fullList = JSON.parse(readFileSync('data/duty.json', 'utf8'));
     fullList["order"] = list;
-    if (rerollIndex) {fullList["rerollIndex"] = rerollIndex;}
+    fullList["rerollIndices"] = rerollIndices;
+    fullList["currentIndex"] = currentIndex;
     writeFileSync('data/duty.json', JSON.stringify(fullList));
 }
 
 function completeDuty(list) {
     let completed = list.shift();
     list.push(completed);
-    writeDutyList(list, 1); // Reset reroll indexu protože nejspíš uběhl už ten týden
+    writeDutyList(list, [], 0); // Reset reroll indices and current index
     return list;
 }
 
@@ -27,21 +28,33 @@ function repeatDuty(list) {
 }
 
 function rerollDuty(list) {
-    let rerollIndex = JSON.parse(readFileSync('data/duty.json', 'utf8'))["rerollIndex"]; // Reroll index je zde kvůli tomu že pokud chybí 2 lidi co jsou v seznamu za sebou tak by se točili mezi sebou
-    let newCurrent = list.splice(rerollIndex, 1)[0]
+    let data = JSON.parse(readFileSync('data/duty.json', 'utf8'));
+    let rerollIndices = data["rerollIndices"] || [];
+    let currentIndex = data["currentIndex"] || 0;
+
+    rerollIndices.push(currentIndex); // Store the current index before rerolling
+
+    let newCurrent = list.splice(currentIndex, 1)[0];
     list.splice(0, 0, newCurrent);
-    rerollIndex++;
-    writeDutyList(list, rerollIndex);
+    currentIndex++;
+    writeDutyList(list, rerollIndices, currentIndex);
     return list;
 }
 
 function undoRerollDuty(list) {
-    let rerollIndex = JSON.parse(readFileSync('data/duty.json', 'utf8'))["rerollIndex"];
-    rerollIndex--;
-    if (rerollIndex < 1) rerollIndex = 1;
+    let data = JSON.parse(readFileSync('data/duty.json', 'utf8'));
+    let rerollIndices = data["rerollIndices"] || [];
+    let currentIndex = data["currentIndex"] || 0;
+
+    if (rerollIndices.length === 0) {
+        return list; // Nothing to undo
+    }
+
+    let previousIndex = rerollIndices.pop(); // Get the previous index
     let newCurrent = list.splice(0, 1)[0];
-    list.splice(rerollIndex-1, 0, newCurrent);
-    writeDutyList(list, rerollIndex);
+    list.splice(previousIndex, 0, newCurrent);
+
+    writeDutyList(list, rerollIndices, Math.max(0, previousIndex)); // Update indices, prevent negative index
     return list;
 }
 
