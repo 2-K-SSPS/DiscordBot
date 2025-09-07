@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-import {schedule} from 'node-cron';
+import { schedule, createTask } from 'node-cron';
 import {completeDuty, getDutyList} from "./utils/duty.js";
 const { token } = require('./config.json');
 
@@ -53,12 +53,24 @@ client.on(Events.InteractionCreate, async interaction => {
 client.once(Events.ClientReady, (c) => {
     let dutyChannel = c.channels.cache.get('972537907732684880');
     console.log(`Ready! Logged in as ${c.user.tag}`);
+    
+    const oneDay = 24 * 60 * 60 * 1000;
+    const firstDate = new Date(2009, 9, 4);
+    const secondDate = new Date();
 
-    schedule('40 7 * * 1', () => {
+    const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+    
+    const hlasky = ["Zkoumá ticho ve třídě", "Nechává problémy uležet", "Neví že je předsedou", "Je stále mrtev", "„Absence není argument“", `Do výuky nechodí již ${diffDays} dnů`, "Je reprezentativně absentní", "Dnes je přítomen jen duševně", "Zdraví z Těšína a volí se"]
+
+    createTask('40 7 * * 1', () => {
         let dutyList = completeDuty(getDutyList());
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
 -# Pokud není ve škole, použij \`/reroll\``);
     })
+    
+    schedule('*/30 * * * *', () => {
+        client.user.setActivity(hlasky[Math.floor(Math.random() * hlasky.length)]);
+    }).execute()
 });
 
 client.login(token);
