@@ -55,7 +55,7 @@ client.once(Events.ClientReady, (c) => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
     
     const oneDay = 24 * 60 * 60 * 1000;
-    const firstDate = new Date(2009, 9, 4);
+    const firstDate = new Date(2025, 9, 4);
     const secondDate = new Date();
 
     const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
@@ -69,7 +69,7 @@ client.once(Events.ClientReady, (c) => {
     })
     
     cron.schedule('*/30 * * * *', () => {
-        client.user.setActivity(hlasky[Math.floor(Math.random() * hlasky.length)]);
+        client.user.setActivity(hlasky[Math.floor(Math.random() * hlasky.length)], {type: ActivityType.Custom});
     }).execute()
 });
 
