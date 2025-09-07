@@ -70,7 +70,7 @@ client.once(Events.ClientReady, (c) => {
     
     cron.schedule('*/30 * * * *', () => {
         client.user.setActivity(hlasky[Math.floor(Math.random() * hlasky.length)]);
-    })
+    }).execute()
 });
 
 client.login(token);
