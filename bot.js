@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, ActivityType } = require('discord.js');
 import cron from 'node-cron';
 import {completeDuty, getDutyList} from "./utils/duty.js";
 const { token } = require('./config.json');
