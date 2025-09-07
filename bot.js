@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-import { schedule, createTask } from 'node-cron';
+import cron from 'node-cron';
 import {completeDuty, getDutyList} from "./utils/duty.js";
 const { token } = require('./config.json');
 
@@ -62,15 +62,15 @@ client.once(Events.ClientReady, (c) => {
     
     const hlasky = ["Zkoumá ticho ve třídě", "Nechává problémy uležet", "Neví že je předsedou", "Je stále mrtev", "„Absence není argument“", `Do výuky nechodí již ${diffDays} dnů`, "Je reprezentativně absentní", "Dnes je přítomen jen duševně", "Zdraví z Těšína a volí se"]
 
-    createTask('40 7 * * 1', () => {
+    cron.createTask('40 7 * * 1', () => {
         let dutyList = completeDuty(getDutyList());
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
 -# Pokud není ve škole, použij \`/reroll\``);
     })
     
-    schedule('*/30 * * * *', () => {
+    cron.schedule('*/30 * * * *', () => {
         client.user.setActivity(hlasky[Math.floor(Math.random() * hlasky.length)]);
-    }).execute()
+    })
 });
 
 client.login(token);
