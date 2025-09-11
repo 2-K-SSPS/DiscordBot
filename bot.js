@@ -62,7 +62,7 @@ client.once(Events.ClientReady, (c) => {
     
     const hlasky = ["Zkoumá ticho ve třídě", "Nechává problémy uležet", "Neví že je předsedou", "Je stále mrtev", "„Absence není argument“", `Do výuky nechodí již ${diffDays} dnů`, "Je reprezentativně absentní", "Dnes je přítomen jen duševně", "Zdraví z Těšína a volí se"]
 
-    cron.createTask('40 7 * * 1', () => {
+    cron.shcedule('40 7 * * 1', () => {
         let dutyList = completeDuty(getDutyList());
         dutyChannel.send(`<@${dutyList[0]}> má tento týden službu!
 -# Pokud není ve škole, použij \`/reroll\``);
