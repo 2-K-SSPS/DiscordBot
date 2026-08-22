@@ -10,4 +10,4 @@ COPY . .
 
 ENV NODE_ENV=production
 
-CMD bun run ./deploy-commands.js && bun run ./bot.js
+CMD bun run ./deploy-commands.ts && bun run ./bot.ts

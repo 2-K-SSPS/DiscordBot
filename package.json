@@ -1,11 +1,14 @@
 {
   "name": "discordbot1k",
-  "module": "bot.js",
+  "module": "bot.ts",
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "scripts": {
+    "start": "bun run bot.ts",
+    "deploy": "bun run deploy-commands.ts",
+    "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5.7.3"
   },
   "dependencies": {

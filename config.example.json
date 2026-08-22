@@ -1,0 +1,7 @@
+{
+  "token": "your-bot-token",
+  "clientId": "your-application-id",
+  "guildId": "your-guild-id",
+  "cronDutyChannelId": "channel-for-the-weekly-cron-announcement",
+  "commandDutyChannelId": "channel-for-command-announcements"
+}
