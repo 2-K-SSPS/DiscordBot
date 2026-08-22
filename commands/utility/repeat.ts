@@ -1,7 +1,7 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { config } from '../../config.ts';
 import { getSendableChannel } from '../../utils/channels.ts';
-import { getCurrentDuty, getDutyList, getStringList, repeatDuty } from '../../utils/duty.ts';
+import { getCurrentDuty, getStringList, repeatDuty } from '../../utils/duty.ts';
 import type { Command } from '../../types.ts';
 
 const command: Command = {
@@ -17,8 +17,8 @@ const command: Command = {
         ),
 
     async execute(interaction) {
-        const dutyChannel = getSendableChannel(interaction.client, config.commandDutyChannelId);
-        const dutyList = repeatDuty(getDutyList());
+        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
+        const dutyList = repeatDuty();
         const reason = interaction.options.getString('reason', true);
 
         await dutyChannel.send(`<@${getCurrentDuty(dutyList)}> má tento týden službu!

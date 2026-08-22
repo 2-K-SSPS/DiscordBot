@@ -1,10 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { projectRoot } from './paths.ts';
 import type { Config } from './types.ts';
-
-/** Absolute path of the project root, independent of the current working directory. */
-export const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 function loadConfig(): Config {
     const configPath = join(projectRoot, 'config.json');

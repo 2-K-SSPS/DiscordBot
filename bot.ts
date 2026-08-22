@@ -3,7 +3,7 @@ import cron from 'node-cron';
 import { config } from './config.ts';
 import { getSendableChannel } from './utils/channels.ts';
 import { loadCommands } from './utils/commands.ts';
-import { completeDuty, getCurrentDuty, getDutyList } from './utils/duty.ts';
+import { completeDuty, getCurrentDuty } from './utils/duty.ts';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -67,8 +67,8 @@ client.once(Events.ClientReady, (readyClient) => {
 
     cron.schedule('40 7 * * 1', async () => {
         try {
-            const dutyChannel = getSendableChannel(readyClient, config.cronDutyChannelId);
-            const dutyList = completeDuty(getDutyList());
+            const dutyChannel = await getSendableChannel(readyClient, config.cronDutyChannelId);
+            const dutyList = completeDuty();
             await dutyChannel.send(`<@${getCurrentDuty(dutyList)}> má tento týden službu!
 -# Pokud není ve škole, použij \`/reroll\``);
         } catch (error) {

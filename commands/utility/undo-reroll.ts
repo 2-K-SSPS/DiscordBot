@@ -1,5 +1,5 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
-import { getDutyList, getStringList, undoRerollDuty } from '../../utils/duty.ts';
+import { getStringList, undoRerollDuty } from '../../utils/duty.ts';
 import type { Command } from '../../types.ts';
 
 const command: Command = {
@@ -12,7 +12,7 @@ const command: Command = {
         ),
 
     async execute(interaction) {
-        const dutyList = undoRerollDuty(getDutyList());
+        const dutyList = undoRerollDuty();
 
         await interaction.reply({
             content: `Služba byla un-přeskočena.

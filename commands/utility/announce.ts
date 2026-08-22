@@ -11,7 +11,7 @@ const command: Command = {
         .setContexts(InteractionContextType.Guild),
 
     async execute(interaction) {
-        const dutyChannel = getSendableChannel(interaction.client, config.commandDutyChannelId);
+        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
         const current = getCurrentDuty(getDutyList());
 
         await dutyChannel.send(`<@${current}> má tento týden službu!`);

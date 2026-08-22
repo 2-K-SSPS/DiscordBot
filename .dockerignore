@@ -1,0 +1,12 @@
+# `bun install` already ran against package.json; the host tree would just overwrite it.
+node_modules
+
+# Local SQLite state. Copying a live database (and its -wal/-shm sidecars) into the image
+# bakes in stale rows and risks an inconsistent snapshot. data/duty.json is kept on purpose:
+# it is the first-boot migration source.
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+.git
+.gitignore

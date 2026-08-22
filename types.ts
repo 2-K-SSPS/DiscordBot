@@ -21,9 +21,14 @@ export interface Config {
     commandDutyChannelId: string;
 }
 
-/** Shape of `data/duty.json`. */
-export interface DutyData {
+/**
+ * Shape of the legacy `data/duty.json`. Live state now lives in SQLite (`utils/db.ts`); this
+ * interface only describes the file as a one-time migration source.
+ */
+export interface LegacyDutyData {
     order: string[];
+    /** Dead key present in the shipped file — never read by the JSON-era code, so not imported. */
+    rerollIndex?: number;
     rerollIndices?: number[] | null;
     currentIndex?: number;
 }

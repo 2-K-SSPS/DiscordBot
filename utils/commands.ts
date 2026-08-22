@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { projectRoot } from '../config.ts';
+import { projectRoot } from '../paths.ts';
 import type { Command } from '../types.ts';
 
 function isCommand(value: unknown): value is Command {

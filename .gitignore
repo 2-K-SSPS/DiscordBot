@@ -174,3 +174,8 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 /config.json
+
+# SQLite duty database (state, not source)
+data/*.db
+data/*.db-wal
+data/*.db-shm
