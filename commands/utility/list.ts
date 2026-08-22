@@ -1,5 +1,6 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { getDutyList, getStringList } from '../../utils/duty.ts';
+import { DUTY_FAILURE_MESSAGES } from '../../utils/replies.ts';
 import type { Command } from '../../types.ts';
 
 const command: Command = {
@@ -9,8 +10,12 @@ const command: Command = {
         .setContexts(InteractionContextType.Guild),
 
     async execute(interaction) {
+        const list = getDutyList();
         await interaction.reply({
-            content: `Pořadník: ${getStringList(getDutyList())}`,
+            content:
+                list.length === 0
+                    ? DUTY_FAILURE_MESSAGES['empty-order']
+                    : `Pořadník: ${getStringList(list)}`,
             flags: MessageFlags.Ephemeral,
         });
     },

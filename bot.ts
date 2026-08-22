@@ -1,9 +1,11 @@
 import { ActivityType, Client, Collection, Events, GatewayIntentBits, MessageFlags } from 'discord.js';
 import cron from 'node-cron';
+import { DUTY_CHECK_CRON, DUTY_TIMEZONE } from './constants.ts';
 import { config } from './config.ts';
 import { getSendableChannel } from './utils/channels.ts';
 import { loadCommands } from './utils/commands.ts';
-import { completeDuty, getCurrentDuty } from './utils/duty.ts';
+import { completeDuty, getCurrentDuty, getLastCompletedWeek } from './utils/duty.ts';
+import { dutyWeekKey, isWeeklyDutyDue } from './utils/week.ts';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -40,6 +42,41 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
+/**
+ * Advances the rotation for `weekKey` and announces the result.
+ *
+ * Shared by the Monday cron and the startup catch-up so the two can never drift apart. Recording
+ * the week is part of `completeDuty`'s transaction, so a crash between rotating and announcing
+ * cannot leave the week marked done without the rotation having happened.
+ */
+async function runWeeklyDuty(client: Client, weekKey: string): Promise<void> {
+    const result = completeDuty(weekKey);
+    if (!result.changed) {
+        console.warn(`Skipped the weekly duty rotation for ${weekKey}: the duty order is empty.`);
+        return;
+    }
+
+    const dutyChannel = await getSendableChannel(client, config.cronDutyChannelId);
+    await dutyChannel.send(`<@${getCurrentDuty(result.list)}> má tento týden službu!
+-# Pokud není ve škole, použij \`/reroll\``);
+}
+
+/**
+ * Posts the week's announcement, if this week's is due and nothing has posted it yet.
+ *
+ * Safe to call as often as you like — the `last_completed_week` guard makes it a no-op once the
+ * week has been announced. Advances the rotation at most **once** however many weeks were missed:
+ * rotating once per missed week would burn through the order and rob everyone of their turn.
+ */
+async function announceWeeklyDutyIfDue(client: Client, trigger: string): Promise<void> {
+    const now = new Date();
+    if (!isWeeklyDutyDue(now, getLastCompletedWeek())) return;
+
+    const weekKey = dutyWeekKey(now);
+    console.log(`Posting the duty announcement for ${weekKey} (${trigger}).`);
+    await runWeeklyDuty(client, weekKey);
+}
+
 /** Rotating "custom status" lines, one picked at random every 30 minutes. */
 function buildStatusLines(): string[] {
     const oneDay = 24 * 60 * 60 * 1000;
@@ -65,15 +102,23 @@ function buildStatusLines(): string[] {
 client.once(Events.ClientReady, (readyClient) => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
-    cron.schedule('40 7 * * 1', async () => {
-        try {
-            const dutyChannel = await getSendableChannel(readyClient, config.cronDutyChannelId);
-            const dutyList = completeDuty();
-            await dutyChannel.send(`<@${getCurrentDuty(dutyList)}> má tento týden službu!
--# Pokud není ve škole, použij \`/reroll\``);
-        } catch (error) {
-            console.error('Failed to post the weekly duty announcement:', error);
-        }
+    cron.schedule(
+        DUTY_CHECK_CRON,
+        async () => {
+            try {
+                await announceWeeklyDutyIfDue(readyClient, 'scheduled');
+            } catch (error) {
+                console.error('Failed to post the weekly duty announcement:', error);
+            }
+        },
+        // Without an explicit timezone this follows the host clock, which is UTC in the container —
+        // the announcement would land at 09:40 Prague in summer and 08:40 in winter.
+        { timezone: DUTY_TIMEZONE, noOverlap: true },
+    );
+
+    // Covers a bot that was offline across the scheduled tick entirely.
+    void announceWeeklyDutyIfDue(readyClient, 'startup').catch((error: unknown) => {
+        console.error('Failed to post the catch-up duty announcement:', error);
     });
 
     cron.schedule('*/30 * * * *', () => {

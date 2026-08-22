@@ -1,7 +1,8 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { config } from '../../config.ts';
 import { getSendableChannel } from '../../utils/channels.ts';
-import { getCurrentDuty, getDutyList } from '../../utils/duty.ts';
+import { getDutyList } from '../../utils/duty.ts';
+import { DUTY_FAILURE_MESSAGES } from '../../utils/replies.ts';
 import type { Command } from '../../types.ts';
 
 const command: Command = {
@@ -11,9 +12,16 @@ const command: Command = {
         .setContexts(InteractionContextType.Guild),
 
     async execute(interaction) {
-        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
-        const current = getCurrentDuty(getDutyList());
+        const current = getDutyList()[0];
+        if (current === undefined) {
+            await interaction.reply({
+                content: DUTY_FAILURE_MESSAGES['empty-order'],
+                flags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
 
+        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
         await dutyChannel.send(`<@${current}> má tento týden službu!`);
         await interaction.reply({
             content: `<@${current}> má tento týden službu!`,

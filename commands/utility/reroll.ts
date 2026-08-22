@@ -2,6 +2,7 @@ import { InteractionContextType, MessageFlags, SlashCommandBuilder } from 'disco
 import { config } from '../../config.ts';
 import { getSendableChannel } from '../../utils/channels.ts';
 import { getCurrentDuty, getStringList, rerollDuty } from '../../utils/duty.ts';
+import { DUTY_FAILURE_MESSAGES } from '../../utils/replies.ts';
 import type { Command } from '../../types.ts';
 
 const command: Command = {
@@ -14,16 +15,24 @@ const command: Command = {
         ),
 
     async execute(interaction) {
-        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
-        const dutyList = rerollDuty();
-        const reason = interaction.options.getString('reason', true);
+        const result = rerollDuty();
+        if (!result.changed) {
+            await interaction.reply({
+                content: DUTY_FAILURE_MESSAGES[result.reason ?? 'empty-order'],
+                flags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
 
-        await dutyChannel.send(`<@${getCurrentDuty(dutyList)}> má tento týden službu!
--# Službu přesločil <@${interaction.user.id}> pomocí příkazu. Přeskočený člověk bude mít službu příští týden.
+        const reason = interaction.options.getString('reason', true);
+        const dutyChannel = await getSendableChannel(interaction.client, config.commandDutyChannelId);
+
+        await dutyChannel.send(`<@${getCurrentDuty(result.list)}> má tento týden službu!
+-# Službu přeskočil <@${interaction.user.id}> pomocí příkazu. Přeskočený člověk bude mít službu příští týden.
 -# Důvod: \`${reason}\``);
         await interaction.reply({
             content: `Služba byla přeskočena.
-Nový pořadník: ${getStringList(dutyList)}`,
+Nový pořadník: ${getStringList(result.list)}`,
             flags: MessageFlags.Ephemeral,
         });
     },
